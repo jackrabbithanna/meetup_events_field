@@ -1,0 +1,5 @@
+name: 'Meetup Events Field'
+type: module
+description: 'Provides a field type for entering meetup.com group name and displaying upcoming events'
+core: 8.x
+package: 'Custom'
