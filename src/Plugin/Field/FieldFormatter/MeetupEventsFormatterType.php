@@ -59,6 +59,9 @@ class MeetupEventsFormatterType extends FormatterBase {
       $elements[$delta] = ['#markup' => $this->viewValue($item)];
     }
 
+    // Not to cache this field formatter.
+    $elements['#cache']['max-age'] = 0;
+
     return $elements;
   }
 
@@ -72,9 +75,22 @@ class MeetupEventsFormatterType extends FormatterBase {
    *   The textual output generated.
    */
   protected function viewValue(FieldItemInterface $item) {
-    // The text value has no text format assigned to it, so the user input
-    // should equal the output, including newlines.
-    return nl2br(Html::escape($item->value));
+    $settings = $item->getFieldDefinition()->getSettings();
+    $api_key = $settings['meetup_api_key'];
+    $client = \Drupal::httpClient();
+    $request = $client->request('GET', 'https://api.meetup.com/2/events?key='. $api_key . '&group_urlname=' . $item->value . '&sign=true');
+    $response = json_decode($request->getBody());
+    $item_return_text = '';
+    if (!empty($response->results)) {
+      foreach ($response->results as $result) {
+        $item_return_text .= '<h3>' . $result->name . '</h3>';
+      }
+    }
+    else {
+      $item_return_text = 'No upcoming events.';
+    }
+
+    return $item_return_text;
   }
 
 }
