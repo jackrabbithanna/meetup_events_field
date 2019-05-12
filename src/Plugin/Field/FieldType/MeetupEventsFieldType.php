@@ -31,6 +31,7 @@ class MeetupEventsFieldType extends FieldItemBase {
       'max_length' => 255,
       'is_ascii' => FALSE,
       'case_sensitive' => FALSE,
+      'meetup_api_key' => '',
     ] + parent::defaultStorageSettings();
   }
 
@@ -40,7 +41,7 @@ class MeetupEventsFieldType extends FieldItemBase {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     // Prevent early t() calls by using the TranslatableMarkup.
     $properties['value'] = DataDefinition::create('string')
-      ->setLabel(new TranslatableMarkup('Text value'))
+      ->setLabel(new TranslatableMarkup('Meetup Group ID'))
       ->setSetting('case_sensitive', $field_definition->getSetting('case_sensitive'))
       ->setRequired(TRUE);
 
@@ -111,6 +112,15 @@ class MeetupEventsFieldType extends FieldItemBase {
       '#description' => t('The maximum length of the field in characters.'),
       '#min' => 1,
       '#disabled' => $has_data,
+    ];
+
+    $elements['meetup_api_key'] = [
+      '#type' => 'textfield',
+      '#title' => t('Meetup.com API Key'),
+      '#default_value' => $this->getSetting('meetup_api_key'),
+      '#required' => TRUE,
+      '#description' => t('The Meetup.com API Key to use to fetch event listings.'),
+      '#disabled' => FALSE,
     ];
 
     return $elements;
